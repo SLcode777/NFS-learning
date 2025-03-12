@@ -31,6 +31,7 @@ export default async function Home() {
       <h1 className="text-3xl font-bold mb-8 text-center">
         Latest Posts ({countPost})
       </h1>
+      <Link href="/posts/create">Create post</Link>
 
       <div className="grid gap-6">
         {posts.map((post) => (

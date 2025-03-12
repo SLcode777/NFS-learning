@@ -19,21 +19,23 @@ model Post {
   slug    String @unique
   content String
 
-  // Incoming 
+  // Relations
   comments Comment[]
+  userId   String
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
 }
 
 model Comment {
   id      Int    @id @default(autoincrement())
-  email   String
-  name    String
   content String
 
-  // Outgoing
+  // Relations
   postId Int
-  post   Post @relation(fields: [postId], references: [id])
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
 }
@@ -48,6 +50,8 @@ model User {
   updatedAt     DateTime
   sessions      Session[]
   accounts      Account[]
+  posts         Post[]
+  comments      Comment[]
 
   @@unique([email])
   @@map("user")
