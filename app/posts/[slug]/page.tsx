@@ -1,3 +1,5 @@
+import CommentsList from "@/components/comments-list";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Card,
   CardContent,
@@ -18,7 +20,25 @@ export default async function Page(props: {
       slug: params.slug,
     },
     include: {
-      comments: true,
+      comments: {
+        include: {
+          user: {
+            select: {
+              name: true,
+              image: true,
+            },
+          },
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      },
+      user: {
+        select: {
+          name: true,
+          image: true,
+        },
+      },
     },
   });
 
@@ -30,13 +50,26 @@ export default async function Page(props: {
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <Card className="mb-8">
         <CardHeader>
+          <div className="flex items-center gap-2 mb-4">
+            <Avatar className="h-10 w-10">
+              <AvatarImage src={post.user.image ?? undefined} />
+              <AvatarFallback>
+                {post.user.name?.[0]?.toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <p className="text-sm font-medium text-gray-900 dark:text-white">
+                {post.user.name}
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                {new Date(post.createdAt).toLocaleDateString()}
+              </p>
+            </div>
+          </div>
           <CardTitle className="text-3xl font-bold text-gray-900 dark:text-white">
             {post.title}
           </CardTitle>
-          <CardDescription>
-            {new Date(post.createdAt).toLocaleDateString()} •{" "}
-            {post.comments.length} comments
-          </CardDescription>
+          <CardDescription>{post.comments.length} comments</CardDescription>
         </CardHeader>
         <CardContent className="prose dark:prose-invert max-w-none">
           {post.content.split("\n").map((paragraph, i) => (
@@ -54,37 +87,7 @@ export default async function Page(props: {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {post.comments.length > 0 ? (
-            <div className="space-y-6">
-              {post.comments.map((comment) => (
-                <div
-                  key={comment.id}
-                  className="border-b border-gray-200 dark:border-gray-700 pb-6 last:border-0"
-                >
-                  <div className="flex items-center mb-2">
-                    <div className="bg-blue-100 dark:bg-blue-900 rounded-full w-8 h-8 flex items-center justify-center text-blue-600 dark:text-blue-300 font-semibold mr-3">
-                      {comment.name.charAt(0).toUpperCase()}
-                    </div>
-                    <div>
-                      <h3 className="font-medium text-gray-900 dark:text-white">
-                        {comment.name}
-                      </h3>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
-                        {new Date(comment.createdAt).toLocaleDateString()}
-                      </p>
-                    </div>
-                  </div>
-                  <p className="text-gray-700 dark:text-gray-300">
-                    {comment.content}
-                  </p>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-gray-500 dark:text-gray-400 text-center py-4">
-              No comments yet. Be the first to comment!
-            </p>
-          )}
+          <CommentsList postId={post.id} initialComments={post.comments} />
         </CardContent>
       </Card>
     </div>
