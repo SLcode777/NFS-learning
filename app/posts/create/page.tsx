@@ -12,11 +12,24 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "next/navigation";
-import { FormEventHandler } from "react";
+import { FormEventHandler, useState } from "react";
 import { toast } from "sonner";
 
 export default function CreatePostPage() {
   const router = useRouter();
+  const [title, setTitle] = useState("");
+  const [slug, setSlug] = useState("");
+
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newTitle = e.target.value;
+    setTitle(newTitle);
+    setSlug(
+      newTitle
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)/g, "")
+    );
+  };
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
@@ -28,6 +41,7 @@ export default function CreatePostPage() {
         body: JSON.stringify({
           title: formData.get("title"),
           content: formData.get("content"),
+          slug: formData.get("slug"),
         }),
       });
 
@@ -42,7 +56,7 @@ export default function CreatePostPage() {
   };
 
   return (
-    <Card>
+    <Card className="max-w-2xl mx-auto">
       <CardHeader>
         <CardTitle>Create a new post</CardTitle>
         <CardDescription>Share your thoughts with the world</CardDescription>
@@ -50,30 +64,60 @@ export default function CreatePostPage() {
 
       <CardContent>
         <form className="space-y-4" onSubmit={handleSubmit}>
-          <div>
-            <Label htmlFor="title">Title</Label>
-            <Input
-              id="title"
-              name="title"
-              placeholder="Enter post title"
-              required
-            />
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="title">Title</Label>
+              <Input
+                id="title"
+                name="title"
+                placeholder="Enter post title"
+                required
+                value={title}
+                onChange={handleTitleChange}
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="slug">
+                Slug
+                <span className="text-xs text-muted-foreground ml-2">
+                  (URL-friendly version of the title)
+                </span>
+              </Label>
+              <Input
+                id="slug"
+                name="slug"
+                placeholder="url-friendly-title"
+                required
+                value={slug}
+                onChange={(e) => setSlug(e.target.value)}
+                pattern="[a-z0-9-]+"
+                title="Only lowercase letters, numbers, and hyphens are allowed"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="content">Content</Label>
+              <Textarea
+                id="content"
+                name="content"
+                placeholder="Write your post content..."
+                required
+                className="min-h-[300px]"
+              />
+            </div>
           </div>
 
-          <div>
-            <Label htmlFor="content">Content</Label>
-            <Textarea
-              id="content"
-              name="content"
-              placeholder="Write your post content..."
-              required
-              className="min-h-[200px]"
-            />
+          <div className="flex justify-end gap-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => router.back()}
+            >
+              Cancel
+            </Button>
+            <Button type="submit">Create Post</Button>
           </div>
-
-          <Button type="submit" className="w-full">
-            Create Post
-          </Button>
         </form>
       </CardContent>
     </Card>

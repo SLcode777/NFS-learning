@@ -15,10 +15,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { FormEventHandler, useState } from "react";
 import { toast } from "sonner";
 
-export default function SignUpPage() {
+export default function ResetPasswordPage() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token") as string;
-  console.log(token);
+
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
