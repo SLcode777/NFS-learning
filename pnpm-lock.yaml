@@ -41,6 +41,9 @@ importers:
       next-themes:
         specifier: ^0.4.4
         version: 0.4.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      next-zod-route:
+        specifier: ^0.1.5
+        version: 0.1.5
       react:
         specifier: ^19.0.0
         version: 19.0.0
@@ -59,6 +62,9 @@ importers:
       tailwindcss-animate:
         specifier: ^1.0.7
         version: 1.0.7(tailwindcss@4.0.9)
+      zod:
+        specifier: ^3.24.2
+        version: 3.24.2
     devDependencies:
       '@eslint/eslintrc':
         specifier: ^3
@@ -1852,6 +1858,10 @@ packages:
     peerDependencies:
       react: ^16.8 || ^17 || ^18 || ^19 || ^19.0.0-rc
       react-dom: ^16.8 || ^17 || ^18 || ^19 || ^19.0.0-rc
+
+  next-zod-route@0.1.5:
+    resolution: {integrity: sha512-gAVtuUyZN6R9Quw/NQSFz0C0/x+sFnlnXfW4S9RiyM5A3Xfo7qoM5DyNN/mMrmuzA2Ic5HEMpRA4FgAj3F5Czw==}
+    engines: {node: '>=18'}
 
   next@15.2.1-canary.5:
     resolution: {integrity: sha512-81GoYGskkuhneyVuEPH23ast8tTE/aVuhp9Edo4W4+fwHgiidO47ZCx7f+h7aZ6FVaffPOFqYlmYOMaEAUeF3A==}
@@ -4283,6 +4293,10 @@ snapshots:
     dependencies:
       react: 19.0.0
       react-dom: 19.0.0(react@19.0.0)
+
+  next-zod-route@0.1.5:
+    dependencies:
+      zod: 3.24.2
 
   next@15.2.1-canary.5(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
     dependencies:
