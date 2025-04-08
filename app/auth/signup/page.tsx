@@ -15,6 +15,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEventHandler, useState } from "react";
 import { toast } from "sonner";
+import { SignInWithGitHub } from "../SignInWithGitHub";
+import { SignInWithGoogle } from "../SignInWithGoogle";
 
 export default function SignUpPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -103,7 +105,10 @@ export default function SignUpPage() {
           <span className="text-muted-foreground text-xs">Or</span>
         </div>
 
-        <Button variant="outline">Continue with Google</Button>
+        <div className="flex items-center gap-2 justify-">
+          <SignInWithGitHub />
+          <SignInWithGoogle />
+        </div>
 
         <p className="text-muted-foreground text-center text-xs">
           Already have an account?{" "}

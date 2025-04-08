@@ -10,6 +10,8 @@ export const SignInWithGitHub = () => {
   return (
     <Button
       disabled={isLoading}
+      className="flex-1"
+      variant="outline"
       onClick={() => {
         authClient.signIn.social(
           {

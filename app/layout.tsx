@@ -33,9 +33,9 @@ export default function RootLayout({
           "h-full"
         )}
       >
-        <div className="p-4 w-full border-x border-muted h-full flex flex-col gap-4 mx-auto min-h-full px-4 py-8 max-w-4xl">
+        <div className="w-full border-x border-muted h-full flex flex-col gap-4 mx-auto min-h-full max-w-2xl">
           <Header />
-          {children}
+          <div className="flex-1 px-4">{children}</div>
           <Toaster />
         </div>
       </body>
