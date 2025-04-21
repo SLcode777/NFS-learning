@@ -101,7 +101,7 @@ export default async function SharePage({
 
   return (
     <div className="container max-w-2xl mx-auto py-10 px-4">
-      <Card className="shadow-none border overflow-hidden">
+      <Card className="shadow-none border overflow-hidden p-0">
         <CardHeader className="pb-3 pt-6 px-6 border-b">
           <div className="flex items-center space-x-3">
             <div className="p-2 bg-muted rounded-md">
