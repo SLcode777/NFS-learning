@@ -11,6 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { authClient } from "@/lib/auth-client";
+import { useMutation } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEventHandler, useState } from "react";
@@ -19,9 +20,37 @@ import { SignInWithGitHub } from "../SignInWithGitHub";
 import { SignInWithGoogle } from "../SignInWithGoogle";
 
 export default function SignUpPage() {
-  const [isLoading, setIsLoading] = useState(false);
   const [isMagicLink, setIsMagicLink] = useState(false);
   const router = useRouter();
+
+  const signInMutation = useMutation({
+    mutationFn: async ({
+      email,
+      password,
+    }: {
+      email: string;
+      password?: string;
+    }) => {
+      if (isMagicLink) {
+        return authClient.signIn.magicLink({
+          email,
+          callbackURL: "/auth",
+        });
+      } else {
+        return authClient.signIn.email({
+          email,
+          password: password!,
+        });
+      }
+    },
+    onSuccess: () => {
+      router.push(isMagicLink ? "/auth/verify" : "/auth");
+      router.refresh();
+    },
+    onError: (error: { message: string }) => {
+      toast.error(error.message);
+    },
+  });
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
@@ -30,37 +59,7 @@ export default function SignUpPage() {
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
 
-    const event = {
-      onRequest: () => {
-        setIsLoading(true);
-      },
-      onSuccess: () => {
-        router.push(isMagicLink ? "/auth/verify" : "/auth");
-        router.refresh();
-      },
-      onError: (ctx: { error: { message: string } }) => {
-        toast.error(ctx.error.message);
-        setIsLoading(false);
-      },
-    };
-
-    if (isMagicLink) {
-      authClient.signIn.magicLink(
-        {
-          email,
-          callbackURL: "/auth",
-        },
-        event
-      );
-    } else {
-      authClient.signIn.email(
-        {
-          email,
-          password,
-        },
-        event
-      );
-    }
+    signInMutation.mutate({ email, password });
   };
 
   return (
@@ -98,7 +97,11 @@ export default function SignUpPage() {
               </div>
             )}
           </div>
-          <Button disabled={isLoading} type="submit" className="w-full">
+          <Button
+            disabled={signInMutation.isPending}
+            type="submit"
+            className="w-full"
+          >
             Sign in
           </Button>
           <button

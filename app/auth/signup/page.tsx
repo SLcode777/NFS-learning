@@ -11,16 +11,42 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { authClient } from "@/lib/auth-client";
+import { useMutation } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FormEventHandler, useState } from "react";
+import { FormEventHandler } from "react";
 import { toast } from "sonner";
 import { SignInWithGitHub } from "../SignInWithGitHub";
 import { SignInWithGoogle } from "../SignInWithGoogle";
 
 export default function SignUpPage() {
-  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+
+  const signUpMutation = useMutation({
+    mutationFn: async ({
+      name,
+      email,
+      password,
+    }: {
+      name: string;
+      email: string;
+      password: string;
+    }) => {
+      return authClient.signUp.email({
+        email,
+        name,
+        password,
+        callbackURL: "/auth",
+      });
+    },
+    onSuccess: () => {
+      router.push("/auth");
+      router.refresh();
+    },
+    onError: (error: { message: string }) => {
+      toast.error(error.message);
+    },
+  });
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
@@ -30,27 +56,7 @@ export default function SignUpPage() {
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
 
-    authClient.signUp.email(
-      {
-        email,
-        name,
-        password,
-        callbackURL: "/auth",
-      },
-      {
-        onRequest: () => {
-          setIsLoading(true);
-        },
-        onSuccess: () => {
-          router.push("/auth");
-          router.refresh();
-        },
-        onError: (ctx) => {
-          toast.error(ctx.error.message);
-          setIsLoading(false);
-        },
-      }
-    );
+    signUpMutation.mutate({ name, email, password });
   };
 
   return (
@@ -96,7 +102,11 @@ export default function SignUpPage() {
               />
             </div>
           </div>
-          <Button disabled={isLoading} type="submit" className="w-full">
+          <Button
+            disabled={signUpMutation.isPending}
+            type="submit"
+            className="w-full"
+          >
             Sign up
           </Button>
         </form>
