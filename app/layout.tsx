@@ -1,8 +1,7 @@
-import { Header } from "@/components/header";
+import { ThemeProvider } from "@/components/theme-provider";
 import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { Toaster } from "sonner";
 import "./globals.css";
 import { Providers } from "./providers";
 
@@ -34,13 +33,14 @@ export default function RootLayout({
           "h-full"
         )}
       >
-        <Providers>
-          <div className="w-full border-x border-muted h-full flex flex-col gap-4 mx-auto min-h-full max-w-2xl">
-            <Header />
-            <div className="flex-1 px-4">{children}</div>
-            <Toaster />
-          </div>
-        </Providers>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <Providers>{children}</Providers>
+        </ThemeProvider>
       </body>
     </html>
   );

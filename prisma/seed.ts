@@ -6,15 +6,11 @@ const prisma = new PrismaClient();
 
 // Number of records to create
 const NUM_USERS = 10;
-const POSTS_PER_USER = 3;
-const COMMENTS_PER_POST = 5;
 
 async function main() {
   console.log("🌱 Starting seed...");
 
   // Clear existing data
-  await prisma.comment.deleteMany({});
-  await prisma.post.deleteMany({});
   await prisma.session.deleteMany({});
   await prisma.account.deleteMany({});
   await prisma.verification.deleteMany({});
@@ -50,46 +46,6 @@ async function main() {
     });
     users.push(user);
     console.log(`👤 Created user: ${user.name}`);
-  }
-
-  // Create posts for each user
-  for (const user of users) {
-    for (let i = 0; i < POSTS_PER_USER; i++) {
-      const title = faker.lorem.sentence({ min: 4, max: 8 });
-      const slug = faker.helpers.slugify(title).toLowerCase();
-
-      const post = await prisma.post.create({
-        data: {
-          title,
-          slug: `${slug}-${faker.string.alphanumeric(6)}`, // Ensure uniqueness
-          content: faker.lorem.paragraphs({ min: 3, max: 7 }),
-          userId: user.id,
-          createdAt: faker.date.recent(),
-        },
-      });
-      console.log(`📝 Created post: ${post.title}`);
-
-      // Create comments for each post
-      const commenters = faker.helpers.arrayElements(
-        users,
-        faker.number.int({ min: 1, max: COMMENTS_PER_POST })
-      );
-      for (const commenter of commenters) {
-        const comment = await prisma.comment.create({
-          data: {
-            content: faker.lorem.paragraph(),
-            postId: post.id,
-            userId: commenter.id,
-            createdAt: faker.date.recent(),
-          },
-        });
-        console.log(
-          `💬 Created comment #${comment.id} by ${
-            commenter.name
-          } on post: ${post.title.substring(0, 20)}...`
-        );
-      }
-    }
   }
 
   console.log("✅ Seed completed successfully!");

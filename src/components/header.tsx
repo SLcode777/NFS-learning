@@ -1,0 +1,51 @@
+import { getUser } from "@/lib/auth-session";
+import Link from "next/link";
+import { LogoutButton } from "./logout";
+import { Button, buttonVariants } from "./ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+
+export const Header = async () => {
+  const user = await getUser();
+
+  console.log(user);
+
+  return (
+    <header className="px-4 py-2 border-b flex items-center gap-2">
+      <Link
+        href="/"
+        className="text-xl font-bold bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-transparent bg-clip-text hover:opacity-80 transition-opacity"
+      >
+        NextDrop.io
+      </Link>
+      <Link href="/files">Upload files</Link>
+      <div className="flex-1"></div>
+      {user ? (
+        <DropdownMenu>
+          <DropdownMenuTrigger>
+            <Button size="sm">{user.name || user.email}</Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem asChild>
+              <Link href="/auth">Account</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <LogoutButton />
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ) : (
+        <Link
+          className={buttonVariants({ size: "sm", variant: "outline" })}
+          href="/auth/signin"
+        >
+          SignIn
+        </Link>
+      )}
+    </header>
+  );
+};
