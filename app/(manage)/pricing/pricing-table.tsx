@@ -10,8 +10,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { useMutation } from "@tanstack/react-query";
 import { Check } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { upgradePlan } from "./price.action";
 
 type PriceType = {
   id: string;
@@ -56,6 +59,22 @@ const prices: PriceType[] = [
 
 export function PricingTable(props: { currentPlan: string }) {
   const [isYearly, setIsYearly] = useState(false);
+  const router = useRouter();
+
+  const upgradeMutation = useMutation({
+    mutationFn: async (priceId: string) => {
+      const result = await upgradePlan({ priceId });
+
+      if (!result?.data) {
+        throw new Error(result?.serverError ?? "Something went wrong");
+      }
+
+      return result.data;
+    },
+    onSuccess: (data) => {
+      router.push(data.url);
+    },
+  });
 
   return (
     <div className="flex flex-col gap-8">
@@ -133,7 +152,16 @@ export function PricingTable(props: { currentPlan: string }) {
                   price.id === "gold" ? "bg-primary hover:bg-primary/90" : ""
                 )}
                 variant={price.id === props.currentPlan ? "outline" : "default"}
-                disabled={price.id === props.currentPlan}
+                disabled={
+                  price.id === props.currentPlan || upgradeMutation.isPending
+                }
+                onClick={() => {
+                  if (price.id === props.currentPlan) return;
+
+                  upgradeMutation.mutate(
+                    isYearly ? price.yearlyPriceId : price.monthlyPriceId
+                  );
+                }}
               >
                 {price.id === props.currentPlan ? "Current Plan" : "Upgrade"}
               </Button>

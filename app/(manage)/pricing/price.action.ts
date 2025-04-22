@@ -1,3 +1,5 @@
+"use server";
+
 import { userAction } from "@/lib/safe-action";
 import { z } from "zod";
 
@@ -15,5 +17,6 @@ export const upgradePlan = userAction
       priceId,
       success: true,
       message: "Plan upgraded successfully",
+      url: "/pricing",
     };
   });
