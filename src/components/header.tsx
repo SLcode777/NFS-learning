@@ -12,8 +12,6 @@ import {
 export const Header = async () => {
   const user = await getUser();
 
-  console.log(user);
-
   return (
     <header className="px-4 py-2 border-b flex items-center gap-2">
       <Link
@@ -22,7 +20,20 @@ export const Header = async () => {
       >
         NextDrop.io
       </Link>
-      <Link href="/files">Upload files</Link>
+      <Link
+        href="/files"
+        className="text-sm text-indigo-500 underline hover:text-indigo-600"
+      >
+        Upload files
+      </Link>
+      {user?.plan === "FREE" ? (
+        <Link
+          href="/pricing"
+          className="text-sm text-indigo-500 underline hover:text-indigo-600"
+        >
+          Upgrade to PRO
+        </Link>
+      ) : null}
       <div className="flex-1"></div>
       {user ? (
         <DropdownMenu>

@@ -7,7 +7,12 @@ export const getUser = async () => {
     headers: await headers(), // you need to pass the headers object.
   });
 
-  return session?.user;
+  if (!session) return null;
+
+  return {
+    ...session.user,
+    plan: "FREE",
+  };
 };
 
 export const getRequiredUser = async () => {

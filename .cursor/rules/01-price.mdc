@@ -1,0 +1,19 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+Hey, on continue l'aventure en gérant l'abonement à notre service.
+On va dire que le plan IRON va coûter 5 euros / mois et le plan GOLD 50 euros / mois car on cible 2 différent type de personne : 
+IRON = le petit freelance qui veut partager 
+GOLD = l'agence qui a besoin de faire beaucoup de partage
+Une fois définit, tu peux aller dans Stripe pour créer le plan en TEST MODE :
+MuxVideo: nfs-stripe-step-3
+Tu peux retrouver les images que j'ai créer dans public/plan dans le projet.
+
+Étape 2 : Définir les limitations
+On va créer un object PLAN_LIMITATIONS qui contient toutes les limitations avec des clés / value par exemple :
+Une fois qu'on a fait ça ensemble, on va pouvoir récupérer le plan depuis la session.user.plan en utiliser as UserPlan !
+Avec ça, tu vas pouvoir limtié l'interfaces avec les valeurs autnat dans le front-end que dans le back-end. Dans les fichiers qui permettent d'upload un nouveau fichier : vérifier les limites.
+Dans les fichiers qui permettent de modifier un fichier, n'accepter la modification du password de du prix uniquement si il a le droit depuis ce fichier.
+Dans l'interface front-end, faire la même chose.
