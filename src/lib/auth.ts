@@ -2,8 +2,11 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
 import { magicLink } from "better-auth/plugins/magic-link";
+import Stripe from "stripe";
 import { prisma } from "./prisma";
 import { resend } from "./resend";
+
+const stripeClient = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
@@ -45,4 +48,23 @@ export const auth = betterAuth({
     }),
     nextCookies(),
   ],
+  secret: process.env.BETTER_AUTH_SECRET,
+  databaseHooks: {
+    user: {
+      create: {
+        before: async (user) => {
+          return { data: { ...user } };
+        },
+        after: async (user, planId) => {
+          //function to create stripe account
+
+          const customer = await stripeClient.customers.create({
+            name: user.name,
+            email: user.email,
+          });
+          return { customer, planId };
+        },
+      },
+    },
+  },
 });

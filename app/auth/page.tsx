@@ -23,6 +23,7 @@ export default async function AuthPage() {
           <AuthForm name={user.name} />
         </CardContent>
       </Card>
+      <Card>{JSON.stringify(user, null, 2)}</Card>
       <Card>
         <CardHeader>
           <CardTitle>Accounts</CardTitle>
