@@ -23,6 +23,7 @@ export default async function FilesPage() {
   const canUploadFiles = filesCount < user.limitation.files;
 
   //I need to disable the password and price fields in the file edit form based on the user plan (see correction video at 5:22)
+  //https://codeline.app/cdly/courses/nextfullstack/lessons/les_MFCXB2mgF4
 
   return (
     <div className="container py-10 space-y-8">
