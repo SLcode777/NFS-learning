@@ -38,7 +38,7 @@ const updateItemSchema = z.object({
   price: z.number().nullish(),
 });
 
-export const updateItem = userAction
+export const updateItemAction = userAction
   .schema(updateItemSchema)
   .action(async ({ parsedInput, ctx }) => {
     const { user } = ctx;
@@ -61,11 +61,12 @@ export const updateItem = userAction
         id: parsedInput.id,
       },
       data: {
-        ...(parsedInput.name && { name: parsedInput.name }),
-        password: parsedInput.password === null ? null : parsedInput.password,
+        ...parsedInput,
+        password: user.limitation.canAddPassword ? parsedInput.password : null,
+        price: user.limitation.canAddPrice ? parsedInput.price : null,
+
         expiresAt:
           parsedInput.expiresAt === null ? null : parsedInput.expiresAt,
-        price: parsedInput.price === null ? null : parsedInput.price,
       },
     });
 

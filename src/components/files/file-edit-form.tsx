@@ -29,6 +29,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { LimitationType } from "@/lib/auth-limitations";
 import { Item } from "@/lib/generated/client";
 import { format } from "date-fns";
 import { CalendarIcon, TrashIcon } from "lucide-react";
@@ -38,7 +39,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import {
   deleteItem,
-  updateItem,
+  updateItemAction,
 } from "../../../app/(manage)/files/file.action";
 import {
   Card,
@@ -62,12 +63,28 @@ type FormValues = z.infer<typeof formSchema>;
 
 interface FileEditFormProps {
   file: Item;
+  limitations: LimitationType;
 }
 
-export function FileEditForm({ file }: FileEditFormProps) {
+// interface UserType {
+//   plan: string;
+//   limitation: LimitationType;
+//   id: string;
+//   name: string;
+//   email: string;
+//   emailVerified: boolean;
+//   createdAt: Date;
+//   updatedAt: Date;
+//   image?: string | null | undefined | undefined;
+// }
+
+export function FileEditForm({ file, limitations }: FileEditFormProps) {
   const router = useRouter();
+
   const [isDeleting, setIsDeleting] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+
+  console.log(limitations);
 
   const form = useZodForm({
     schema: formSchema,
@@ -82,7 +99,7 @@ export function FileEditForm({ file }: FileEditFormProps) {
   const onSubmit = async (values: FormValues) => {
     setIsUpdating(true);
     try {
-      await updateItem({
+      await updateItemAction({
         id: file.id,
         ...values,
         price: values.price ? Math.floor(values.price * 100) : null,
@@ -161,29 +178,30 @@ export function FileEditForm({ file }: FileEditFormProps) {
                 </FormItem>
               )}
             />
-
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      type="password"
-                      placeholder="Set a password (optional)"
-                      value={field.value || ""}
-                      onChange={(e) => field.onChange(e.target.value || null)}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    Password protect this file (leave empty for no password)
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {limitations.canAddPassword ? (
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="password"
+                        placeholder="Set a password (optional)"
+                        value={field.value || ""}
+                        onChange={(e) => field.onChange(e.target.value || null)}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Password protect this file (leave empty for no password)
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            ) : null}
 
             <FormField
               control={form.control}
@@ -236,42 +254,44 @@ export function FileEditForm({ file }: FileEditFormProps) {
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="price"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Price (USD)</FormLabel>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                      <span className="text-muted-foreground">$</span>
+            {limitations.canAddPricing ? (
+              <FormField
+                control={form.control}
+                name="price"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Price (USD)</FormLabel>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                        <span className="text-muted-foreground">$</span>
+                      </div>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          placeholder="0.00"
+                          className="pl-8"
+                          value={field.value === null ? "" : field.value}
+                          onChange={(e) =>
+                            field.onChange(
+                              e.target.value === ""
+                                ? null
+                                : parseFloat(e.target.value)
+                            )
+                          }
+                        />
+                      </FormControl>
                     </div>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        placeholder="0.00"
-                        className="pl-8"
-                        value={field.value === null ? "" : field.value}
-                        onChange={(e) =>
-                          field.onChange(
-                            e.target.value === ""
-                              ? null
-                              : parseFloat(e.target.value)
-                          )
-                        }
-                      />
-                    </FormControl>
-                  </div>
-                  <FormDescription>
-                    Set a price (leave empty for free)
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                    <FormDescription>
+                      Set a price (leave empty for free)
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            ) : null}
 
             <div className="flex justify-end pt-4">
               <Button type="submit" disabled={isUpdating}>

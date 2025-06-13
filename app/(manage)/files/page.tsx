@@ -11,6 +11,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { getRequiredUser } from "@/lib/auth-session";
+import { canUploadFileDS } from "@/lib/domain-service/canUploadFile";
 import { prisma } from "@/lib/prisma";
 import { UploadIcon } from "lucide-react";
 import Link from "next/link";
@@ -20,10 +21,7 @@ export default async function FilesPage() {
   const user = await getRequiredUser();
   const filesCount = await prisma.item.count({ where: { userId: user.id } });
 
-  const canUploadFiles = filesCount < user.limitation.files;
-
-  //I need to disable the password and price fields in the file edit form based on the user plan (see correction video at 5:22)
-  //https://codeline.app/cdly/courses/nextfullstack/lessons/les_MFCXB2mgF4
+  const canUploadFiles = await canUploadFileDS();
 
   return (
     <div className="container py-10 space-y-8">

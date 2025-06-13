@@ -1,7 +1,11 @@
-type LimitationType = {
+export type LimitationType = {
   files: number;
   canAddPassword: boolean;
   canAddPricing: boolean;
+};
+
+export type UserPlan = {
+  planName: string;
 };
 
 export const PLAN_LIMITATIONS: Record<UserPlan, LimitationType> = {

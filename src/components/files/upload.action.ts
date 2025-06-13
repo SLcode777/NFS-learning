@@ -1,5 +1,6 @@
 "use server";
 
+import { canUploadFileDS } from "@/lib/domain-service/canUploadFile";
 import { ItemType } from "@/lib/generated/client";
 import { prisma } from "@/lib/prisma";
 import { userAction } from "@/lib/safe-action";
@@ -34,6 +35,12 @@ export const uploadFileAction = userAction
   .schema(formDataSchema)
   .action(async ({ parsedInput, ctx }) => {
     const { user } = ctx;
+
+    const canUploadFiles = await canUploadFileDS();
+
+    if (!canUploadFiles) {
+      throw new Error("User plan does not authorize this action");
+    }
 
     const file = parsedInput.file;
 
