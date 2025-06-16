@@ -1,3 +1,4 @@
+import { stripe } from "@/lib/stripe";
 import { createSafeActionClient } from "next-safe-action";
 import { getUser } from "./auth-session";
 
@@ -19,5 +20,21 @@ export const userAction = actionClient.use(async ({ next }) => {
 
   return next({
     ctx: { user },
+  });
+});
+
+export const stripeSessionAction = actionClient.use(async ({ next }) => {
+  const session = await stripe.checkout.sessions.create({
+    line_items: [
+      {
+        price: "{{PRICE_ID}}",
+        quantity: 1,
+      },
+    ],
+    mode: "payment",
+    success_url: "https://localhost:3000/success",
+  });
+  return next({
+    ctx: { session },
   });
 });
