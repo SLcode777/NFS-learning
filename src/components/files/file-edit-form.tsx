@@ -84,7 +84,7 @@ export function FileEditForm({ file, limitations }: FileEditFormProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
 
-  console.log(limitations);
+  console.log("show limitations on file edit page: ", limitations);
 
   const form = useZodForm({
     schema: formSchema,

@@ -12,8 +12,7 @@ export const getUser = async () => {
 
   return {
     ...session.user,
-    plan: session.user.plan,
-    limitation: getLimitation(session.user.plan),
+    limiations: getLimitation(session.user.plan),
   };
 };
 

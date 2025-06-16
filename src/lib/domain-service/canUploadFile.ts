@@ -5,7 +5,7 @@ export const canUploadFileDS = async () => {
   const user = await getRequiredUser();
   const filesCount = await prisma.item.count({ where: { userId: user.id } });
 
-  const canUploadFiles = filesCount < user.limitation.files;
+  const canUploadFiles = filesCount < user.limiations.files;
 
   return canUploadFiles;
 };

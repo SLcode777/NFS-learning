@@ -29,7 +29,7 @@ export async function FilesList() {
   return (
     <div className="grid grid-cols-1 gap-4">
       {files.map((file) => (
-        <FileCard key={file.id} file={file} />
+        <FileCard key={file.id} file={file}  />
       ))}
     </div>
   );

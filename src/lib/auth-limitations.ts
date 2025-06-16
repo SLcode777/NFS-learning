@@ -1,11 +1,9 @@
+import { UserPlan } from "./generated/client";
+
 export type LimitationType = {
   files: number;
   canAddPassword: boolean;
   canAddPricing: boolean;
-};
-
-export type UserPlan = {
-  planName: string;
 };
 
 export const PLAN_LIMITATIONS: Record<UserPlan, LimitationType> = {
@@ -27,7 +25,6 @@ export const PLAN_LIMITATIONS: Record<UserPlan, LimitationType> = {
 };
 
 export const getLimitation = (plan?: string | null) => {
-  //
   const limitation = PLAN_LIMITATIONS[plan as UserPlan];
 
   return limitation || PLAN_LIMITATIONS.FREE;

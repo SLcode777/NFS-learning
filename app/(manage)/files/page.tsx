@@ -41,7 +41,7 @@ export default async function FilesPage() {
               <DialogHeader>
                 <DialogTitle>Storage Limit Reached</DialogTitle>
                 <DialogDescription>
-                  You have reached your storage limit of {user.limitation.files}{" "}
+                  You have reached your storage limit of {user.limiations.files}{" "}
                   files. Please upgrade your plan to upload more files.
                 </DialogDescription>
               </DialogHeader>

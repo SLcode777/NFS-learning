@@ -29,7 +29,7 @@ export default async function FilePage({ params }: FilePageProps) {
 
   return (
     <div className="container py-10 max-w-2xl space-y-8">
-      <FileEditForm file={file} limitations={user.limitation} />
+      <FileEditForm file={file} limitations={user.limiations} />
     </div>
   );
 }

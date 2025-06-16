@@ -2,7 +2,7 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
 import { magicLink } from "better-auth/plugins/magic-link";
-import Stripe from "stripe";
+import { default as Stripe } from "stripe";
 import { prisma } from "./prisma";
 import { resend } from "./resend";
 
@@ -12,6 +12,15 @@ export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
+
+  user: {
+    additionalFields: {
+      plan: {
+        type: "string",
+        required: false,
+      },
+    },
+  },
 
   appName: "prisma-auth-app",
   emailAndPassword: {
@@ -52,17 +61,52 @@ export const auth = betterAuth({
   databaseHooks: {
     user: {
       create: {
-        before: async (user) => {
-          return { data: { ...user } };
-        },
-        after: async (user, planId) => {
-          //function to create stripe account
+        after: async (user) => {
+          //function to create stripe account and then, update user in our database
 
           const customer = await stripeClient.customers.create({
             name: user.name,
             email: user.email,
           });
-          return { customer, planId };
+
+          await prisma.user.update({
+            where: {
+              id: user.id,
+            },
+            data: {
+              stripeCustomerId: customer.id,
+            },
+          });
+        },
+      },
+      update: {
+        after: async (user) => {
+          //
+          console.log("looking for customer on stripe... ");
+
+          const { stripeCustomerId } = await prisma.user.findUniqueOrThrow({
+            where: {
+              id: user.id,
+            },
+            select: {
+              stripeCustomerId: true,
+            },
+          });
+
+          if (!stripeCustomerId) {
+            console.log(
+              "no customer with this id was found on stripe database ! "
+            );
+          } else {
+            console.log("customer Id found : ", stripeCustomerId);
+            console.log("updating customer on stripe, please wait ... ");
+
+            await stripeClient.customers.update(stripeCustomerId, {
+              email: user.email,
+              name: user.name,
+            });
+            console.log("customer has been updated, congratulations !");
+          }
         },
       },
     },

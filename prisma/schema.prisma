@@ -8,6 +8,7 @@ generator client {
   provider = "prisma-client-js"
   seed     = "ts-node prisma/seed.ts"
   output   = "../src/lib/generated/client"
+  binaryTargets = "native"
 }
 
 datasource db {
@@ -23,6 +24,8 @@ model User {
   image         String?
   createdAt     DateTime
   updatedAt     DateTime
+  stripeCustomerId  String?
+  plan          UserPlan @default(FREE)
   sessions      Session[]
   accounts      Account[]
   items         Item[]
@@ -110,7 +113,7 @@ model Feature {
   plan      Plan @relation(fields: [planId], references: [id]) 
 }
 
-enum PlanType {
+enum UserPlan {
   FREE
   IRON
   GOLD
