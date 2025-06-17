@@ -1,5 +1,6 @@
 import { getUser } from "@/lib/auth-session";
 import Link from "next/link";
+import { BillingButton } from "../../app/(manage)/user/billing/billing-button";
 import { LogoutButton } from "./logout";
 import { Button, buttonVariants } from "./ui/button";
 import {
@@ -8,6 +9,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+
+//tried to implement the billing management portal using stripe documentation
+//total failure
+//https://docs.stripe.com/customer-management/integrate-customer-portal#redirect
 
 export const Header = async () => {
   const user = await getUser();
@@ -43,6 +48,9 @@ export const Header = async () => {
           <DropdownMenuContent>
             <DropdownMenuItem asChild>
               <Link href="/auth">Account</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <BillingButton />
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <LogoutButton />
