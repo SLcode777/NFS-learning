@@ -48,10 +48,19 @@ export const upgradePlan = userAction
           quantity: 1,
         },
       ],
+      metadata: {
+        plan : plan.id
+      },
       mode: "subscription",
       success_url: "http://localhost:3000/success",
       cancel_url: "http://localhost:3000/pricing",
     });
+
+    if (!stripeCheckout.url) {
+      throw new Error("no checkout url setup !");
+    }
+
+    console.log("stripe checkout url : ", stripeCheckout.url);
 
     return {
       user,
@@ -61,5 +70,3 @@ export const upgradePlan = userAction
       url: stripeCheckout.url,
     };
   });
-
-  //see correction video at 04:40 to finish the stripe checkout setup
