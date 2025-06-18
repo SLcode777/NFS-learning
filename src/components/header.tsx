@@ -1,6 +1,6 @@
 import { getUser } from "@/lib/auth-session";
+import Image from "next/image";
 import Link from "next/link";
-import { BillingButton } from "../../app/(manage)/user/billing/billing-button";
 import { LogoutButton } from "./logout";
 import { Button, buttonVariants } from "./ui/button";
 import {
@@ -13,6 +13,8 @@ import {
 //tried to implement the billing management portal using stripe documentation
 //total failure
 //https://docs.stripe.com/customer-management/integrate-customer-portal#redirect
+//go for the no-code version instead :
+//https://docs.stripe.com/customer-management/activate-no-code-customer-portal
 
 export const Header = async () => {
   const user = await getUser();
@@ -27,19 +29,36 @@ export const Header = async () => {
       </Link>
       <Link
         href="/files"
-        className="text-sm text-indigo-500 underline hover:text-indigo-600"
+        className="text-sm min-w-fit text-indigo-500 underline hover:text-indigo-600"
       >
         Upload files
       </Link>
       {user?.plan === "FREE" ? (
         <Link
           href="/pricing"
-          className="text-sm text-indigo-500 underline hover:text-indigo-600"
+          className="text-sm min-w-fit text-indigo-500 underline hover:text-indigo-600"
         >
           Upgrade to PRO
         </Link>
       ) : null}
-      <div className="flex-1"></div>
+      <div className="flex flex-row w-full justify-end">
+        {user?.plan === "IRON" ? (
+          <Image
+            src="/public/plan/PLAN_IRON.png"
+            alt="user-plan-icon"
+            height={30}
+            width={30}
+          ></Image>
+        ) : null}
+        {user?.plan === "GOLD" ? (
+          <Image
+            src="/plan/PLAN_GOLD.png"
+            alt="user-plan-icon"
+            height={30}
+            width={30}
+          ></Image>
+        ) : null}
+      </div>
       {user ? (
         <DropdownMenu>
           <DropdownMenuTrigger>
@@ -50,7 +69,7 @@ export const Header = async () => {
               <Link href="/auth">Account</Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <BillingButton />
+              <Link href={process.env.STIPE_CLIENT_PORTAL_LINK!}>Billing</Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <LogoutButton />

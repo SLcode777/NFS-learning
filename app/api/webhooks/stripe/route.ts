@@ -43,6 +43,8 @@ export const POST = async (req: NextRequest) => {
         console.log("chekoutSession customer", customer);
         console.log("checkoutSession plan", plan);
 
+        console.log("prisma db update...");
+
         await prisma.user.update({
           where: {
             stripeCustomerId: customer,
@@ -52,12 +54,19 @@ export const POST = async (req: NextRequest) => {
           },
         });
 
+        console.log("prisma db updated");
+
         break;
       case "customer.subscription.updated":
         const updateSubscription = event.data.object;
         const customer2 = updateSubscription.customer as string;
         const metadata2 = updateSubscription.metadata;
         const plan2 = metadata2?.plan;
+
+        console.log("update sub : ", updateSubscription);
+        console.log("prisma db update...");
+
+//watch correction video at 6:50 to see the end of exercise
 
         await prisma.user.update({
           where: {
@@ -68,7 +77,8 @@ export const POST = async (req: NextRequest) => {
           },
         });
 
-        console.log("update sub : ", updateSubscription);
+        console.log("prisma db updated");
+
         break;
       case "customer.subscription.deleted":
         const deletedSubscription = event.data.object;
@@ -77,6 +87,8 @@ export const POST = async (req: NextRequest) => {
         const isActive2 = deletedSubscription.status === "active";
 
         if (!isActive2) {
+          console.log("prisma db update...");
+
           await prisma.user.update({
             where: {
               stripeCustomerId: customer3,
@@ -87,6 +99,7 @@ export const POST = async (req: NextRequest) => {
           });
         }
         console.log("deleted sub : ", deletedSubscription);
+        console.log("prisma db updated !");
 
         break;
       default:

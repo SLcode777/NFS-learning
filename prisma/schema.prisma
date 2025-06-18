@@ -34,21 +34,6 @@ model User {
   @@map("user")
 }
 
-model Session {
-  id        String   @id
-  expiresAt DateTime
-  token     String
-  createdAt DateTime
-  updatedAt DateTime
-  ipAddress String?
-  userAgent String?
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([token])
-  @@map("session")
-}
-
 model Account {
   id                    String    @id
   accountId             String
@@ -67,6 +52,38 @@ model Account {
 
   @@map("account")
 }
+
+enum UserPlan {
+  FREE
+  IRON
+  GOLD
+}
+
+model Plan {
+  id          Int   @id @default(autoincrement()) @unique
+  name        String @unique
+  type        ItemType
+  fileLimit   Int
+  price       Int
+  features    Feature[] 
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime
+  updatedAt DateTime
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@map("session")
+}
+
+
 
 model Verification {
   id         String    @id
@@ -113,17 +130,3 @@ model Feature {
   plan      Plan @relation(fields: [planId], references: [id]) 
 }
 
-enum UserPlan {
-  FREE
-  IRON
-  GOLD
-}
-
-model Plan {
-  id          Int   @id @default(autoincrement()) @unique
-  name        String @unique
-  type        ItemType
-  fileLimit   Int
-  price       Int
-  features    Feature[] 
-}

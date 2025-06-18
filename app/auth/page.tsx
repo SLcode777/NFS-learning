@@ -1,11 +1,23 @@
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { auth } from "@/lib/auth";
-import { getRequiredUser } from "@/lib/auth-session";
+import { getRequiredUser, getUser } from "@/lib/auth-session";
+import { prisma } from "@/lib/prisma";
+import { stripe } from "@/lib/stripe";
 import { headers } from "next/headers";
+import Image from "next/image";
+import { redirect } from "next/navigation";
 import { AuthForm } from "./auth-form";
 
 export default async function AuthPage() {
   const user = await getRequiredUser();
+  const planImagePath = (userPlan: string) => {
+    if (userPlan === "GOLD") {
+      return "/plan/GOLD_PLAN.png";
+    } else if (user.plan === "IRON") {
+      return "/plan/IRON_PLAN.png";
+    } else return "/file.svg";
+  };
   const accounts = await auth.api.listUserAccounts({
     headers: await headers(),
   });
@@ -24,6 +36,64 @@ export default async function AuthPage() {
         </CardContent>
       </Card>
       <Card>{JSON.stringify(user, null, 2)}</Card>
+      <Card>
+        <CardHeader>
+          <CardTitle>Subscription Management</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form className="flex flex-col gap-2" action="">
+            <Card className="flex border border-muted-foreground w-fit mt-6">
+              <CardHeader className="font-bold w-full text-center text-2xl">
+                CURRENT PLAN
+              </CardHeader>
+              <CardContent className="flex flex-col w-full  items-center  gap-2">
+                <div className="font-bold">{user.plan}</div>
+                <Image
+                  src={planImagePath(user.plan!)}
+                  alt="userplan logo"
+                  height={40}
+                  width={40}
+                />
+              </CardContent>
+              <Button
+                className="m-4"
+                formAction={async () => {
+                  "use server";
+
+                  const currentUser = await getUser();
+                  const { stripeCustomerId } =
+                    await prisma.user.findUniqueOrThrow({
+                      where: {
+                        id: currentUser?.id,
+                      },
+                      select: {
+                        stripeCustomerId: true,
+                      },
+                    });
+
+                  if (!stripeCustomerId) {
+                    throw new Error("invalid customer Id");
+                  }
+
+                  const billingPortal =
+                    await stripe.billingPortal.sessions.create({
+                      customer: stripeCustomerId,
+                      return_url: "http://localhost:3000/auth",
+                    });
+
+                  if (!billingPortal.url) {
+                    throw new Error("invalid billing portal url");
+                  }
+
+                  redirect(billingPortal.url);
+                }}
+              >
+                Manage subscription
+              </Button>
+            </Card>
+          </form>
+        </CardContent>
+      </Card>
       <Card>
         <CardHeader>
           <CardTitle>Accounts</CardTitle>
